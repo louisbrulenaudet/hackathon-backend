@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Hackathon backend based on fastapi and pydantic validation design to ship fast fast fast 🏎️"
 license = "Apache-2.0"
 readme = "README.md"
-keywords = ["fastapi", "hackathon", "openai", "llm", "deep learning", "data analysis", "image-processing", "text-processing", "information-retrieval", "image-analysis", "data-science", "data-engineering", "data-visualization", "data-mining", "data-cleaning", "data-preprocessing", "data-wrangling", "data-integration", "data-transformation", "data-modeling", "data-analytics", "data-pipelines", "image-generation", "agentic-ai", "llm-agents", "llm-automation", "llm-analytics", "llm-data-processing", "llm-data-analysis", "llm-data-engineering", "llm-data-science", "llm-data-mining", "llm-data-cleaning", "llm-data-preprocessing", "llm-data-wrangling", "llm-data-integration", "llm-data-transformation", "llm-data-modeling", "llm-data-visualization"]
+keywords = ["fastapi", "hackathon", "llm", "deep learning", "data analysis", "text-processing", "information-retrieval", "data-science", "data-engineering", "data-visualization", "data-mining", "data-cleaning", "data-preprocessing", "data-wrangling", "data-integration", "data-transformation", "data-modeling", "data-analytics", "data-pipelines", "agentic-ai", "llm-agents", "llm-automation", "llm-analytics", "llm-data-processing", "llm-data-analysis", "llm-data-engineering", "llm-data-science", "llm-data-mining", "llm-data-cleaning", "llm-data-preprocessing", "llm-data-wrangling", "llm-data-integration", "llm-data-transformation", "llm-data-modeling", "llm-data-visualization"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science and Research",
@@ -26,12 +26,9 @@ dependencies = [
     "httpx>=0.28.1",
     "pydantic>=2.10.6",
     "pydantic-settings>=2.7.1",
-    "openai>=1.79.0",
-    "pillow>=11.3.0",
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
     "pytest-asyncio>=1.0.0",
-    "polars>=1.31.0",
     "python-dotenv>=1.1.1",
 ]
 

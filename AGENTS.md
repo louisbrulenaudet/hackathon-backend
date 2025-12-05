@@ -2,18 +2,15 @@
 
 ## Project Overview
 
-This repository is a FastAPI-based backend service optimized for rapid development and feedback-driven shipping during hackathons. Built with FastAPI, Pydantic v2, and modern Python tooling, this service provides a fast, type-safe foundation for building hackathon projects with OpenAI, LLM automation, and agentic AI workflows. The service emphasizes speed, type safety, and clean architecture patterns to enable rapid iteration and deployment.
+This repository is a FastAPI-based backend service optimized for rapid development and feedback-driven shipping during hackathons.
 
 ## Tech Stack
 
 - **Language:** Python 3.12+ (strict type hints)
 - **Framework:** FastAPI (async web framework)
 - **Validation:** Pydantic v2 (data validation and settings management)
-- **Data Processing:** Polars (high-performance DataFrame library)
 - **HTTP Client:** httpx (async HTTP client)
 - **Caching:** aiocache (async caching)
-- **AI/ML:** OpenAI SDK (LLM integration)
-- **Image Processing:** Pillow (image manipulation)
 - **Formatting/Linting:** Ruff (fast Python linter and formatter)
 - **Package Manager:** uv (fast Python package installer and resolver)
 - **Build Tools:** Docker, Docker Compose
@@ -339,4 +336,3 @@ async def async_fetch_data():
 - Use utility decorators for retry logic when appropriate
 - Keep components modular and independent for hackathon development
 - **Security Note:** The CORS middleware currently allows all origins for hackathon convenience. This should be restricted in production environments.
-
