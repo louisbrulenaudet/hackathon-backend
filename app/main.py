@@ -4,9 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from starlette.responses import JSONResponse
 
-from app._exceptions import CoreError
 from app.api.v1.router import router as api_router
 from app.core.config import settings
+from app.exceptions.core_exception import CoreError
 
 load_dotenv()
 

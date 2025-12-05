@@ -1,5 +1,6 @@
-from app._enums import ErrorCodes
-from app._exceptions import ClientInitializationError, CoreError
+from app.enums.error_codes import ErrorCodes
+from app.exceptions.client_initialization_error import ClientInitializationError
+from app.exceptions.core_exception import CoreError
 
 
 def test_core_error_str_and_dict():
@@ -24,4 +25,4 @@ def test_client_initialization_error():
     assert isinstance(err, CoreError)
     assert err.message == "The client initialization failed."
     assert err.code == ErrorCodes.CLIENT_INITIALIZATION_ERROR
-    assert "fail" in err.details
+    assert isinstance(err.details, str) and "fail" in err.details
