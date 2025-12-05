@@ -6,11 +6,13 @@
         ".pytest_cache": true
     },
     "cSpell.words": [
+        "agentic",
         "aiocache",
         "anyio",
         "asyncio",
         "certifi",
         "dnspython",
+        "docstrings",
         "dotenv",
         "dtos",
         "fastapi",
@@ -30,6 +32,7 @@
         "pluggy",
         "pydantic",
         "pygments",
+        "pyproject",
         "pytest",
         "pyyaml",
         "rignore",
