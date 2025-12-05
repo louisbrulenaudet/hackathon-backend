@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
-from app._enums import ErrorCodes
-from app._exceptions import CoreError
+from app.enums.error_codes import ErrorCodes
+from app.exceptions.core_exception import CoreError
 from app.main import app
 
 

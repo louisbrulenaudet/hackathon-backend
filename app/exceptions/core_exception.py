@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from app._enums import ErrorCodes
+from app.enums.error_codes import ErrorCodes
 
 __all__ = [
     "CoreError",
@@ -98,12 +98,3 @@ class CoreError(Exception):
             "code": self.code,
             "details": self.details or {},
         }
-
-
-class ClientInitializationError(CoreError):
-    def __init__(self, details: Exception | str) -> None:
-        super().__init__(
-            "The client initialization failed.",
-            ErrorCodes.CLIENT_INITIALIZATION_ERROR,
-            details=str(details),
-        )
