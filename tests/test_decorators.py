@@ -149,3 +149,22 @@ async def test_async_retry_non_retry_exceptions():
 
     with pytest.raises(NonRetryError):
         await func()
+
+
+@pytest.mark.asyncio
+async def test_retry_guard_raises_when_event_loop_running(monkeypatch):
+    called = {"sleep": 0}
+
+    def fake_sleep(_: float) -> None:
+        called["sleep"] += 1
+
+    monkeypatch.setattr("app.utils.decorators.sleep", fake_sleep)
+
+    @retry(max_retries=3, sleep_time=0.1)
+    def func():
+        raise CustomError()
+
+    with pytest.raises(RuntimeError, match="Use async_retry\\(\\) instead"):
+        func()
+
+    assert called["sleep"] == 0

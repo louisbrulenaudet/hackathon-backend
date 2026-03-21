@@ -8,26 +8,21 @@ __all__ = [
     "CoreError",
 ]
 
-import logging
-
-# Configure logging
-logging.basicConfig(level=logging.ERROR)
-logger = logging.getLogger(__name__)
-
 
 class CoreError(Exception):
     """
     A custom exception class for handling application-specific errors.
 
     This exception includes an error message, an error code, and optional details.
-    It also logs the error upon initialization.
 
     Attributes:
         message (str): A descriptive error message.
         code (ErrorCodes): An enumerated error code representing the specific error type.
         details (dict[str, Any] | str | None): Additional details about the error.
+        http_status_code (int): HTTP status code returned by the global exception handler. Override this class attribute in subclasses to change the response status.
     """
 
+    http_status_code: int = 400
     message: str
     code: ErrorCodes
     details: dict[str, Any] | str | None
@@ -52,11 +47,6 @@ class CoreError(Exception):
         self.message = message
         self.code = code
         self.details = details
-
-        # Log the error with its details
-        logger.error(
-            f"CoreError: {self.message} [Code: {self.code}] Details: {self.details}"
-        )
 
     def __str__(self) -> str:
         """

@@ -11,7 +11,7 @@ classifiers = [
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Science",
     "Topic :: Scientific/Engineering :: Information Analysis",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
@@ -19,34 +19,39 @@ classifiers = [
     "Topic :: Text Processing :: General"
 ]
 
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "aiocache>=0.12.3",
-    "fastapi[standard]>=0.115.7",
+    # Same as fastapi[standard], but fastapi-cli[standard-no-fastapi-cloud-cli] omits
+    # fastapi-cloud-cli / sentry-sdk (see Astral/FastAPI CLI extras).
+    "email-validator>=2.3.0",
+    "fastapi-cli[standard-no-fastapi-cloud-cli]>=0.0.24",
+    "fastapi>=0.135.1",
     "httpx>=0.28.1",
-    "pydantic>=2.10.6",
-    "pydantic-settings>=2.7.1",
-    "pytest>=8.4.1",
-    "pytest-cov>=6.2.1",
-    "pytest-asyncio>=1.0.0",
-    "python-dotenv>=1.1.1",
+    "jinja2>=3.1.6",
+    "pydantic>=2.12.5",
+    "pydantic-settings>=2.13.1",
+    "python-dotenv>=1.2.2",
+    "python-multipart>=0.0.22",
+    "uvicorn[standard]>=0.42.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pre-commit>=4.1.0",
-    "pre-commit-uv>=4.1.4",
-    "pytest>=8.3.4",
-    "pytest-asyncio>=0.23.5",
-    "pytest-cov>=4.1.0",
-    "ruff>=0.9.3",
+    "pre-commit>=4.5.1",
+    "pre-commit-uv>=4.2.1",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.15.7",
+    "ty>=0.0.24",
 ]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
 addopts = "--maxfail=1 --disable-warnings -q --cov=app --cov-report=term-missing"
 asyncio_mode = "auto"
-asyncio_default_fixture_loop_scope = "function"
+asyncio_default_fixture_loop_scope = "session"
 
 [tool.ruff.lint]
 select = [
@@ -79,9 +84,6 @@ ignore = [
     "E402",
 ]
 
-[tool.logfire]
-pydantic_plugin_record = "all"
-
 [tool.ruff]
 fix = true
 
@@ -103,11 +105,6 @@ packages = ["app"]
 [tool.coverage.run]
 branch = true
 source = ["app"]
-
-[dependency-groups]
-dev = [
-    "ty>=0.0.1a6",
-]
 
 [tool.coverage.report]
 exclude_lines = [

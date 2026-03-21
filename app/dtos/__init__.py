@@ -1,5 +1,6 @@
-from app.dtos.models import PingResponse
+from app.dtos.models import HealthResponse, PingResponse
 
-__all__: list[str] = [
+__all__ = [
+    "HealthResponse",
     "PingResponse",
 ]

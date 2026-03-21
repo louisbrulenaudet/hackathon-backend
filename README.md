@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Maintainer](https://img.shields.io/badge/maintainer-@louisbrulenaudet-blue)](https://github.com/louisbrulenaudet)
-[![Python Version](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/)
+[![Python Version](https://img.shields.io/badge/python-3.13%2B-blue.svg)](https://www.python.org/)
 [![Code Style](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Package Manager](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 
@@ -10,7 +10,7 @@ This repository is a FastAPI-based backend service optimized for rapid developme
 
 In order to run the backend the fastest way possible, you can use the makefile setup and uv for Python dependency management.
 
-If the frontend team needs to run their application separately, the recommended and most secure approach is to clone this repository twice: once for production (e.g., with a `-prod` suffix) and once for development (e.g., with a `-dev` suffix). Keep the production backend on the `main` branch and the development backend on the appropriate development branches. Start the production backend using `make prod`, then share your IP address with the frontend team so they can connect to the backend.
+If the frontend team needs to run their application separately, the recommended and most secure approach is to clone this repository twice: once for production (e.g., with a `-prod` suffix) and once for development (e.g., with a `-dev` suffix). Keep the production backend on the `main` branch and the development backend on the appropriate development branches. Start the production backend using `make prod`, then share your IP address with the frontend team so they can connect to the backend (unless you use Cloudflare Tunnel; see below).
 
 You can get your IP address by running the following command:
 
@@ -18,13 +18,13 @@ You can get your IP address by running the following command:
 ipconfig getifaddr en0
 ```
 
-> **Warning:** Do not forget to disable your firewall or allow the port 8001 in your firewall settings to allow the frontend team to connect to your backend. Make commands are only available in unix-like systems (Linux, macOS). For Windows users, you can use the WSL (Windows Subsystem for Linux) to run these commands.
+> **Warning:** Do not forget to disable your firewall or allow the port 8001 in your firewall settings to allow the frontend team to connect to your backend when not using a tunnel. Make commands are only available in unix-like systems (Linux, macOS). For Windows users, you can use the WSL (Windows Subsystem for Linux) to run these commands.
 
 To ensure smooth development and minimize conflicts, it is recommended to implement each component in its own dedicated router and corresponding business logic files within the `core` directory. This modular approach enables you to test and develop components independently, reducing the risk of interfering with other parts of the application. Organizing your code in this way enhances maintainability, scalability, and clarity, making it easier to merge core features across branches and integrate them into different routers as the project evolves.
 
 ## Tech Stack
 
-- **Language:** Python 3.12+ (strict type hints)
+- **Language:** Python 3.13+ (strict type hints)
 - **Framework:** FastAPI (async web framework)
 - **Validation:** Pydantic v2 (data validation and settings management)
 - **HTTP Client:** httpx (async HTTP client)
@@ -68,7 +68,8 @@ To ensure smooth development and minimize conflicts, it is recommended to implem
 ├── compose.yaml                     # Docker Compose configuration
 ├── Dockerfile                       # Docker image definition
 ├── Makefile                         # Main Makefile with command shortcuts
-└── requirements.txt                 # Python dependencies (generated from pyproject.toml)
+├── uv.lock                          # Locked dependency graph (canonical for uv, CI, and Docker)
+└── requirements.txt                 # Optional pip-style export (`make export-requirements`; `uv.lock` is canonical)
 ```
 
 ## Environment Configuration
@@ -81,13 +82,19 @@ The application uses Pydantic Settings for configuration management. Required en
 - `API_KEY` - API key for authentication
 - `API_CLIENT` - API client identifier
 
+### Telemetry and tooling
+
+This project avoids the FastAPI Cloud CLI stack (`fastapi-cloud-cli` / `sentry-sdk`) by depending on `fastapi-cli[standard-no-fastapi-cloud-cli]` with the same “standard” pieces as `fastapi[standard]`. Logfire export is disabled by default via environment variables in the Makefile, Docker, Compose, and CI. **uv** does not document a switch to turn off PyPI User-Agent metadata; see [astral-sh/uv#8474](https://github.com/astral-sh/uv/issues/8474).
+
 ### Setup Instructions
 
 1. **Install dependencies:**
 
    ```sh
-   make init
+   make sync
    ```
+
+   (`make install` is an alias for `sync`. The `dev` optional extra matches CI: `uv sync --locked --extra dev`.)
 
 2. **Configure environment:**
 
@@ -98,6 +105,33 @@ The application uses Pydantic Settings for configuration management. Required en
    API_KEY=your_api_key_here
    API_CLIENT=your_client_id_here
    ```
+
+3. **(Optional) Run with Docker Compose**
+
+   Your `compose.yaml` uses `env_file: .env` to pass these values at **container start** (this is runtime configuration; it is not related to `.dockerignore`).
+
+   Example:
+
+   ```sh
+   docker compose up --build
+   ```
+
+   If you want to set values explicitly in YAML (not recommended for real secrets), you can use:
+
+   ```yaml
+   environment:
+     APP_NAME: "Hackathon Backend"
+     API_KEY: "your_api_key_here"
+     API_CLIENT: "your_client_id_here"
+   ```
+
+### Optional: Cloudflare Tunnel (Development Sharing)
+
+If you want to let a colleague access the API without opening port `8001`:
+
+- Docker Compose hot-reload workflow: set `TUNNEL_TOKEN` in `.env` and run `make run-dev-tunnel` (tunnel is opt-in via the Compose profile `tunnel`).
+
+In the Compose workflow, `cloudflared` will print the public tunnel URL in the terminal (or via `make tunnel-logs` for the Compose workflow).
 
 3. **Development:**
 
@@ -128,9 +162,12 @@ The following Makefile commands are available for development, formatting, testi
 | `make dev`             | Run development server with hot reloading   |
 | `make prod`            | Run production server on port 8001          |
 | `make test`            | Run the test suite with coverage            |
-| `make init`            | Initialize development environment          |
-| `make install-dev`     | Install development dependencies            |
-| `make upgrade`         | Update project dependencies                 |
+| `make sync`            | Sync `.venv` from `uv.lock` (includes `dev` extra) |
+| `make sync-all`        | Sync with all optional extras                |
+| `make install`         | Alias for `make sync`                       |
+| `make upgrade`         | Update locked deps (`uv lock --upgrade` + sync) |
+| `make export-requirements` | Regenerate `requirements.txt` from `uv.lock` (optional) |
+| `make clean-venv`      | Remove local `.venv`                        |
 | `make check`           | Run code quality checks (Ruff linting)      |
 | `make format`          | Format the codebase using Ruff              |
 | `make pre-commit`      | Run pre-commit checks on all files          |
@@ -147,7 +184,12 @@ The following Makefile commands are available for development, formatting, testi
 | `make logs`            | Display container logs                       |
 | `make clean`           | Remove all containers and volumes            |
 | `make run-dev`         | Start development server with live reload    |
+| `make run-dev-tunnel`  | Start dev + Cloudflare Tunnel (opt-in)       |
+| `make tunnel-logs`     | Follow Cloudflare Tunnel logs                |
+| `make tunnel-stop`     | Stop Cloudflare Tunnel (keeps app)           |
 | `make check-docker`    | Verify Docker installation and configuration |
+
+The [`Dockerfile`](Dockerfile) exposes two targets: `runtime` (uvicorn, dependencies only—what CI builds) and `reload` (same dependency set as `runtime`, but runs `fastapi dev` with reload for local Compose). Optional `[dev]` extras (pytest, ruff, etc.) are for local/CI tooling, not installed in the image.
 
 ## Best Practices
 
@@ -174,7 +216,7 @@ The following Makefile commands are available for development, formatting, testi
 In order to run the backend the fastest way possible, you can use the makefile setup and uv for Python dependency management as this:
 
 ```sh
-make init
+make sync
 make upgrade
 make dev
 ```
@@ -192,7 +234,7 @@ uv add transformers
 ### 1. Initialize the environment
 
 ```sh
-make init
+make sync
 ```
 
 ### 2. Start FastAPI server
