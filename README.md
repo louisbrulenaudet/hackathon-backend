@@ -166,7 +166,6 @@ The following Makefile commands are available for development, formatting, testi
 | `make sync-all`        | Sync with all optional extras                |
 | `make install`         | Alias for `make sync`                       |
 | `make update`         | Update locked deps (`uv lock --upgrade` + sync) |
-| `make export-requirements` | Regenerate `requirements.txt` from `uv.lock` (optional) |
 | `make clean-venv`      | Remove local `.venv`                        |
 | `make check`           | Run code quality checks (Ruff linting)      |
 | `make format`          | Format the codebase using Ruff              |
