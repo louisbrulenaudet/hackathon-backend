@@ -8,6 +8,7 @@ from aiocache.backends.memory import SimpleMemoryCache
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.v1.router import router as api_router
@@ -15,6 +16,7 @@ from app.core.config import get_settings
 from app.exceptions.core_exception import CoreError
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 
 @asynccontextmanager
@@ -29,9 +31,9 @@ async def lifespan(_: FastAPI) -> AsyncGenerator[None]:
 
 
 app = FastAPI(
-    title=get_settings().name,
+    title=settings.name,
     description="Hackathon backend based on FastAPI and Pydantic validation designed to ship fast, fast, fast 🏎️",
-    version=get_settings().version,
+    version=settings.version,
     lifespan=lifespan,
 )
 
@@ -40,12 +42,20 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allows all origins
     allow_credentials=False,
-    allow_methods=["*"],  # Allows all methods (GET, POST, PUT, DELETE, etc.)
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "Origin"],
+    expose_headers=["X-Request-ID"],
 )
 
-app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(
+    GZipMiddleware,
+    minimum_size=1500,
+    compresslevel=5,
+)
 app.include_router(api_router, prefix="/api/v1")
+
+if settings.force_https:
+    app.add_middleware(HTTPSRedirectMiddleware)
 
 
 @app.exception_handler(CoreError)

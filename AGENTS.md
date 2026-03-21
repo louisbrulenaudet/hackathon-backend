@@ -123,7 +123,6 @@ The following Makefile commands are available for development, formatting, testi
 | `make sync-all`        | Sync with all optional extras from `pyproject.toml` |
 | `make install`         | Alias for `make sync`                      |
 | `make update`         | Update project dependencies (`uv lock --upgrade` + sync) |
-| `make export-requirements` | Regenerate `requirements.txt` from `uv.lock` (optional) |
 | `make clean-venv`      | Remove local `.venv` only                  |
 | `make check`           | Run code quality checks (Ruff linting)      |
 | `make format`          | Format the codebase using Ruff              |

@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     service_start_time: float = Field(default_factory=time.time, exclude=True)
     api_key: str = Field(default="", alias="API_KEY")
     api_client: str = Field(default="", alias="API_CLIENT")
+    force_https: bool = Field(default=False, alias="FORCE_HTTPS")
 
     model_config = SettingsConfigDict(env_file=".env")
 
