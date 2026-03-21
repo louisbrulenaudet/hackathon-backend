@@ -1,10 +1,11 @@
 # Python Hackathon Backend – Optimized for rapid development and Feedback-Driven shipping (Mistral 2024, OpenAI 2025, DeepMind Medgemma 2025)
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Maintainer](https://img.shields.io/badge/maintainer-@louisbrulenaudet-blue)](https://github.com/louisbrulenaudet)
-[![Python Version](https://img.shields.io/badge/python-3.13%2B-blue.svg)](https://www.python.org/)
-[![Code Style](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
-[![Package Manager](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+[![FastAPI](https://img.shields.io/static/v1?label=framework&message=FastAPI&color=blue&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Pydantic](https://img.shields.io/static/v1?label=validation&message=Pydantic&color=blue&logo=pydantic&logoColor=white)](https://docs.pydantic.dev/)
+[![Docker](https://img.shields.io/static/v1?label=deployment&message=Docker&color=blueviolet&logo=docker&logoColor=white)](https://www.docker.com/)
+[![uv](https://img.shields.io/static/v1?label=package%20manager&message=uv&color=blueviolet&logo=uv&logoColor=white)](https://docs.astral.sh/uv/)
+[![Ruff](https://img.shields.io/static/v1?label=linting&message=Ruff&color=blueviolet&logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
+[![GitHub Actions](https://img.shields.io/static/v1?label=ci/cd&message=GitHub%20Actions&color=blueviolet&logo=github-actions&logoColor=white)](https://github.com/features/actions)
 
 This repository is a FastAPI-based backend service optimized for rapid development and feedback-driven shipping during hackathons.
 
@@ -82,6 +83,8 @@ The application uses Pydantic Settings for configuration management. Required en
 - `API_KEY` - API key for authentication
 - `API_CLIENT` - API client identifier
 
+> Note: The API key and API client identifier are not used in this template but are included for future use and example purposes.
+
 ### Telemetry and tooling
 
 This project avoids the FastAPI Cloud CLI stack (`fastapi-cloud-cli` / `sentry-sdk`) by depending on `fastapi-cli[standard-no-fastapi-cloud-cli]` with the same “standard” pieces as `fastapi[standard]`. Logfire export is disabled by default via environment variables in the Makefile, Docker, Compose, and CI. **uv** does not document a switch to turn off PyPI User-Agent metadata; see [astral-sh/uv#8474](https://github.com/astral-sh/uv/issues/8474).
@@ -102,8 +105,7 @@ This project avoids the FastAPI Cloud CLI stack (`fastapi-cloud-cli` / `sentry-s
 
    ```
    APP_NAME=Hackathon Backend
-   API_KEY=your_api_key_here
-   API_CLIENT=your_client_id_here
+   ...
    ```
 
 3. **(Optional) Run with Docker Compose**
@@ -121,13 +123,12 @@ This project avoids the FastAPI Cloud CLI stack (`fastapi-cloud-cli` / `sentry-s
    ```yaml
    environment:
      APP_NAME: "Hackathon Backend"
-     API_KEY: "your_api_key_here"
-     API_CLIENT: "your_client_id_here"
+     ...
    ```
 
 ### Optional: Cloudflare Tunnel (Development Sharing)
 
-If you want to let a colleague access the API without opening port `8001`:
+If you want to share the API without opening port `8001` to the public internet (e.g. for testing purposes):
 
 - Docker Compose hot-reload workflow: set `TUNNEL_TOKEN` in `.env` and run `make run-dev-tunnel` (tunnel is opt-in via the Compose profile `tunnel`).
 
@@ -273,11 +274,11 @@ make prod
 If you use this code in your research, please use the following BibTeX entry.
 
 ```BibTeX
-@misc{louisbrulenaudet2025,
+@misc{louisbrulenaudet2026,
 author = {Louis Brulé Naudet},
 title = {Python Hackathon Backend – Optimized for rapid development and Feedback-Driven shipping (Mistral 2024, OpenAI 2025, DeepMind Medgemma 2025)},
 howpublished = {\url{https://github.com/louisbrulenaudet/hackathon-backend}},
-year = {2025}
+year = {2026}
 }
 ```
 
