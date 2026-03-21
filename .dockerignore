@@ -1,6 +1,7 @@
 # Ignore Python cache and bytecode
 __pycache__/
 *.py[cod]
+*.pyo
 *.so
 
 # Ignore virtual environments
@@ -10,6 +11,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.venv.bak/
 
 # Ignore distribution/build artifacts
 build/
@@ -17,6 +19,14 @@ dist/
 *.egg-info/
 .eggs/
 *.egg
+*.whl
+wheels/
+share/python-wheels/
+
+# Secrets / environment files (avoid leaking into images)
+.env
+.env.*
+.env.template
 
 # Ignore version control
 .git/
@@ -34,8 +44,25 @@ tests/
 # Ignore editor/project files
 .vscode/
 .idea/
+.cursor/
+.cursorignore
+.cursorindexingignore
 
-# Ignore other config/cache
+# Ignore docs and licenses
+README.md
+AGENTS.md
+LICENSE
+*.md
+
+# Ignore dev/ci and tooling (not needed in the runtime image)
+Makefile
+make/
+compose.yaml
+.github/
+.pre-commit-config.yaml
+
+# Ignore logs
 *.log
-*.pdm-python
-.pdm-build/
+
+# Dependencies not used by Docker build
+requirements.txt

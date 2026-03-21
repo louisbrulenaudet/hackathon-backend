@@ -1,9 +1,13 @@
-# app/__init__.py
-# This file can be left empty, or you can expose important objects for easier access.
+from __future__ import annotations
 
-from fastapi import FastAPI
+from typing import TYPE_CHECKING
 
-__all__ = ["get_app"]
+if TYPE_CHECKING:  # pragma: no cover
+    from fastapi import FastAPI
+
+__all__ = [
+    "get_app",
+]
 
 
 def get_app() -> FastAPI:

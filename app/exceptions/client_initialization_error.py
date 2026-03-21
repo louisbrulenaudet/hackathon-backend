@@ -7,6 +7,8 @@ __all__ = [
 
 
 class ClientInitializationError(CoreError):
+    http_status_code: int = 500
+
     def __init__(self, details: Exception | str) -> None:
         super().__init__(
             "The client initialization failed.",

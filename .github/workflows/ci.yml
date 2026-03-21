@@ -9,28 +9,58 @@ on:
 permissions:
   contents: read
 
+env:
+  LOGFIRE_SEND_TO_LOGFIRE: "false"
+  LOGFIRE_PYDANTIC_PLUGIN_RECORD: "off"
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
+    name: Lint and tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version: "3.13"
 
-      - name: Install uv
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          uv --version
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.10.12"
+          enable-cache: true
 
       - name: Install dependencies
-        run: |
-          uv venv
-          uv pip install -e ".[dev]"
+        run: uv sync --locked --extra dev
+
+      - name: Run lint with ruff
+        run: uv run ruff check .
 
       - name: Run tests with pytest
-        run: uv run pytest
+        run: uv run pytest -q
+
+  docker-build:
+    name: Build runtime image
+    runs-on: ubuntu-latest
+    needs: test
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build runtime image
+        env:
+          DOCKER_BUILDKIT: "1"
+        run: docker build --target runtime -t hackathon-backend:runtime .

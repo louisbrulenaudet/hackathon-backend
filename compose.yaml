@@ -1,17 +1,61 @@
 services:
   app:
+    # API container for local development (Dockerfile target `reload`: hot reload, same deps as `runtime`)
+    # - Loads configuration from `.env` (do not commit secrets)
+    # - Hot-reloads using the mounted `./app` volume
     container_name: hackathon-backend
     build:
       context: .
       dockerfile: Dockerfile
+      target: reload
     working_dir: /app
+    # Start the FastAPI app in development mode
     command: ["fastapi", "dev", "app/main.py", "--host", "0.0.0.0", "--port", "8001", "--reload"]
     ports:
+      # Expose container port 8001 on the host
       - "8001:8001"
     env_file:
+      # Provide runtime secrets/config (this is independent from `.dockerignore`)
       - .env
+    environment:
+      LOGFIRE_SEND_TO_LOGFIRE: "false"
+      LOGFIRE_PYDANTIC_PLUGIN_RECORD: "off"
+    # Alternative (explicit) configuration.
+    # Use this instead of `env_file` only if you know what you're doing and
+    # keep secrets out of version control.
+    #
+    # environment:
+    #   APP_NAME: "Hackathon Backend"
+    #   API_KEY: "your_api_key_here"
+    #   API_CLIENT: "your_client_id_here"
     volumes:
+      # Mount source for live reload (host -> container)
       - ./app:/app/app
     restart: unless-stopped
     networks:
-      - app-network
+      - internal
+
+  cloudflared:
+    # Cloudflare Tunnel sidecar for sharing the development API externally.
+    # Opt-in via Compose profile `tunnel`.
+    profiles: ["tunnel"]
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    # The tunnel token identifies the tunnel configuration created in Cloudflare.
+    # We also pass the local URL so the tunnel knows where to forward traffic.
+    command: tunnel --no-autoupdate run --url http://app:8001
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge

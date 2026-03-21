@@ -6,7 +6,7 @@ This repository is a FastAPI-based backend service optimized for rapid developme
 
 ## Tech Stack
 
-- **Language:** Python 3.12+ (strict type hints)
+- **Language:** Python 3.13+ (strict type hints)
 - **Framework:** FastAPI (async web framework)
 - **Validation:** Pydantic v2 (data validation and settings management)
 - **HTTP Client:** httpx (async HTTP client)
@@ -50,7 +50,8 @@ This repository is a FastAPI-based backend service optimized for rapid developme
 ├── compose.yaml                     # Docker Compose configuration
 ├── Dockerfile                       # Docker image definition
 ├── Makefile                         # Main Makefile with command shortcuts
-└── requirements.txt                 # Python dependencies (generated from pyproject.toml)
+├── uv.lock                          # Locked dependency graph (canonical for uv sync / CI / Docker)
+└── requirements.txt                 # Optional pip-style export (`make export-requirements`; uv.lock is canonical)
 ```
 
 ## Environment Configuration
@@ -63,13 +64,21 @@ The application uses Pydantic Settings for configuration management. Required en
 - `API_KEY` - API key for authentication
 - `API_CLIENT` - API client identifier
 
+### Telemetry and tooling
+
+- **FastAPI CLI:** Dependencies use `fastapi-cli[standard-no-fastapi-cloud-cli]` so the stack does not install `fastapi-cloud-cli` / `sentry-sdk` (the default `fastapi[standard]` extra pulls those).
+- **Pydantic Logfire:** `LOGFIRE_SEND_TO_LOGFIRE` and `LOGFIRE_PYDANTIC_PLUGIN_RECORD` are set to off/false via [`make/variables.mk`](make/variables.mk), [`Dockerfile`](Dockerfile), [`compose.yaml`](compose.yaml), and [`.github/workflows/ci.yml`](.github/workflows/ci.yml) as defense-in-depth.
+- **uv:** There is no documented environment variable to disable metadata included in uv’s User-Agent on registry requests (PyPI linehaul–style data). Mitigations are organizational (private indexes, proxy policy). See [astral-sh/uv#8474](https://github.com/astral-sh/uv/issues/8474).
+
 ### Setup Instructions
 
 1. **Install dependencies:**
 
    ```sh
-   make init
+   make sync
    ```
+
+   (`make install` is an alias for `sync`. Development tools come from the `dev` optional extra, same as CI: `uv sync --locked --extra dev`.)
 
 2. **Configure environment:**
 
@@ -110,9 +119,12 @@ The following Makefile commands are available for development, formatting, testi
 | `make dev`             | Run development server with hot reloading   |
 | `make prod`            | Run production server on port 8001          |
 | `make test`            | Run the test suite with coverage            |
-| `make init`            | Initialize development environment          |
-| `make install-dev`     | Install development dependencies            |
-| `make upgrade`         | Update project dependencies                 |
+| `make sync`            | Sync `.venv` from `uv.lock` (includes `dev` extra; same idea as CI) |
+| `make sync-all`        | Sync with all optional extras from `pyproject.toml` |
+| `make install`         | Alias for `make sync`                      |
+| `make upgrade`         | Update project dependencies (`uv lock --upgrade` + sync) |
+| `make export-requirements` | Regenerate `requirements.txt` from `uv.lock` (optional) |
+| `make clean-venv`      | Remove local `.venv` only                  |
 | `make check`           | Run code quality checks (Ruff linting)      |
 | `make format`          | Format the codebase using Ruff              |
 | `make pre-commit`      | Run pre-commit checks on all files          |
@@ -281,7 +293,7 @@ async def async_fetch_data():
 
 ## Coding Conventions
 
-- Use **strict Python 3.12+** with comprehensive type hints
+- Use **strict Python 3.13+** with comprehensive type hints
 - **Variables:** Use `snake_case` for all variables and functions (e.g., `account_id`, `get_account()`)
 - **Classes:** Use `PascalCase` for class names (e.g., `CoreError`, `PingResponse`)
 - **Constants:** Use `UPPER_SNAKE_CASE` for constants (e.g., `API_KEY`, `MAX_RETRIES`)
@@ -322,6 +334,10 @@ async def async_fetch_data():
 - **GET `/api/v1/health`**
   - Lightweight healthcheck for Docker/K8s
   - Returns: `{"status": "ok"}`
+
+## Continuous integration
+
+GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs Ruff and pytest via `uv sync --locked --extra dev`, then builds the Docker `runtime` image. The **uv** version is pinned in the workflow (`astral-sh/setup-uv`) for reproducible CI—bump it deliberately when upgrading uv (verify locally with `uv lock` and `make test` before merging).
 
 ## Contribution
 

@@ -1,9 +1,9 @@
-import enum
+from enum import StrEnum
 
-__all__: list[str] = [
+__all__ = [
     "ErrorCodes",
 ]
 
 
-class ErrorCodes(enum.StrEnum):
+class ErrorCodes(StrEnum):
     CLIENT_INITIALIZATION_ERROR = "CLIENT_INITIALIZATION_ERROR"

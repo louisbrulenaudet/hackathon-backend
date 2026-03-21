@@ -4,7 +4,7 @@ from app.api.v1.endpoints import (
     base_router,
 )
 
-__all__: list[str] = [
+__all__ = [
     "router",
 ]
 
